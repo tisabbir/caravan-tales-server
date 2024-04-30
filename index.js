@@ -29,6 +29,7 @@ async function run() {
 
     const spots = client.db("spotsDB").collection("spots");
     const allSpots = client.db("spotsDB").collection("allSpots");
+    const countryCollection = client.db("spotsDB").collection("countryCollection");
 
     app.get("/spots", async (req, res) => {
       const cursor = spots.find();
@@ -48,16 +49,42 @@ async function run() {
       const result =  await cursor.toArray();
       res.send(result)
   })
+
   app.get("/allspots/:id", async (req, res) => {
     const id = req.params.id;
     const query = { _id: new ObjectId(id) };
     const result = await allSpots.findOne(query);
     res.send(result);
   });
+
+  app.get('/list', async(req,res)=>{
+
+    const user = req.body;
+
+    console.log(user);
+    const query = { userEmail: user.email};
+    const result = await allSpots.find(query);
+    res.send(result)
+  })
+
     app.post("/allspots", async (req, res) => {
       const newSpot = req.body;
       console.log(newSpot);
       const result = await allSpots.insertOne(newSpot);
+      res.send(result);
+    });
+
+    app.delete('/allspots/:id', async(req,res)=> {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await allSpots.deleteOne(query);
+      res.send(result)
+    })
+
+    // Country 
+    app.get("/country", async (req, res) => {
+      const cursor = countryCollection.find();
+      const result = await cursor.toArray();
       res.send(result);
     });
 
